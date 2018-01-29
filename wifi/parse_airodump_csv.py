@@ -5,7 +5,10 @@ import re
 
 bssid_reg = re.compile('(?:[0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}')
 
-with open('dump-01.csv') as f:
+if len(sys.argv) != 2:
+	print '[+] usage: %s <filename>' % sys.argv[0]
+
+with open(sys.argv[1]) as f:
     d = f.read()
 
 AP = []
@@ -26,8 +29,10 @@ for line in d.split('\n'):
     new_ap = {'bssid':bssid, 'channel':channel, 'authentication':authentication, 'beacons':int(beacons), 'essid':essid, 'clients':clients}
     AP.append(new_ap)
 
-newlist = sorted(AP, key=lambda k: k['beacons'], reverse=True)
-for x in newlist:
-    if x['authentication'] == 'OPN' or len(x['clients']) == 0:
+APs = sorted(AP, key=lambda k: k['beacons'], reverse=True)
+for AP in APs:
+    if len(AP['clients']) == 0:
         continue
-    print x
+    print '[%s] channel: %s, authentication: %s, bssid: %s' % (AP['essid'], AP['channel'], AP['authentication'], AP['bssid'])
+    for client in AP['clients']:
+        print '\t[%s] power: %s, beacons: %s' % (client['bssid'], client['power'], client['beacons'])
