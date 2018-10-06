@@ -1,10 +1,7 @@
 #!/usr/bin/env python2
 
 from subprocess import check_output
-from urllib import urlencode
 import requests
-import sys
-import os
 import re
 
 STATUS_FILE = '/home/laxa/status'
@@ -51,7 +48,7 @@ def main():
             send_sms(msg)
             print(msg)
 
-        output += '%s %s\n' % (host, boolean_to_status(alive))    
+        output += '%s %s\n' % (host, boolean_to_status(alive))
 
     # save status
     with open(STATUS_FILE, 'w') as f:
