@@ -12,17 +12,23 @@ CREDENTIALS_FILE = '/home/laxa/Documents/up/key'
 
 def is_alive(server):
     cmd = '/bin/ping -c 2 %s' % server
-    output = check_output(cmd.split())
+    try:
+        output = check_output(cmd.split())
+    except Exception as e:
+        print(str(e))
     match = re.findall('(\d) received', output)
-    if len(match) and int(match[0]) > 1:
+    if len(match) and int(match[0]) > 0:
         return True
     return False
 
 def send_sms(message):
-    with open(CREDENTIALS_FILE, 'r') as f:
-        data = f.read()
-    user, key = tuple(data.split())
-    requests.get('https://smsapi.free-mobile.fr/sendmsg?user=%s&pass=%s&msg=%s' % (user, key, message))
+    try:
+        with open(CREDENTIALS_FILE, 'r') as f:
+            data = f.read()
+        user, key = tuple(data.split())
+        requests.get('https://smsapi.free-mobile.fr/sendmsg?user=%s&pass=%s&msg=%s' % (user, key, message))
+    except Exception as e:
+        print(str(e))
 
 def boolean_to_status(status):
     return 'up' if status else 'down'
