@@ -1,18 +1,25 @@
 #!/usr/bin/env python2
 
-from subprocess import check_output
+from subprocess import check_output, CalledProcessError
 import requests
 import re
+import os
 
-STATUS_FILE = '/home/laxa/status'
-CREDENTIALS_FILE = '/home/laxa/Documents/up/key'
+STATUS_FILE = '/home/laxa/Documents/up/status'
+CREDENTIALS_FILE = '/home/laxa/scripts/.key'
 
-def is_alive(server):
+def is_alive(server, t=1):
+    if t > 3:
+        return False
     cmd = '/bin/ping -c 2 %s' % server
     try:
-        output = check_output(cmd.split())
+        with open(os.devnull, 'w') as devnull:
+            output = check_output(cmd.split(), stderr=devnull)
+    except CalledProcessError:
+        return is_alive(server, t + 1)
     except Exception as e:
         print(str(e))
+        return False
     match = re.findall('(\d) received', output)
     if len(match) and int(match[0]) > 0:
         return True
