@@ -20,19 +20,35 @@ for line in d.split('\n'):
         break
     if not bssid_reg.match(s[0]):
         continue
-    bssid, channel, authentication, beacons, essid = (s[0].strip(), s[3].strip(), s[5].strip(), s[9].strip(), s[13].strip())
+    bssid, channel, authentication, power, beacons, essid = (s[0].strip(),
+															 s[3].strip(),
+															 s[5].strip(),
+															 s[8].strip(),
+															 s[9].strip(),
+															 s[13].strip())
+    if power == '-1': # if power is not stable, we skip
+		continue
     clients = []
     for client in d.split('\n'):
         if client.count(',') == 6 and client.split(',')[5].strip() == bssid:
             client = {'bssid':client.split(',')[0], 'power':client.split(',')[3], 'beacons':client.split(',')[4]}
             clients.append(client)
-    new_ap = {'bssid':bssid, 'channel':channel, 'authentication':authentication, 'beacons':int(beacons), 'essid':essid, 'clients':clients}
+    new_ap = {'bssid':bssid, 'channel':channel,
+			  'authentication':authentication,
+			  'beacons':int(beacons),
+			  'essid':essid,
+			  'power':power,
+			  'clients':clients}
     AP.append(new_ap)
 
-APs = sorted(AP, key=lambda k: k['beacons'], reverse=True)
+APs = sorted(AP, key=lambda k: k['power'], reverse=False)
 for AP in APs:
     if len(AP['clients']) == 0:
         continue
-    print '[%s] channel: %s, authentication: %s, bssid: %s' % (AP['essid'], AP['channel'], AP['authentication'], AP['bssid'])
+    print '[%s][%s] channel: %s, authentication: %s, bssid: %s' % (AP['essid'],
+																   AP['power'],
+																   AP['channel'],
+																   AP['authentication'],
+																   AP['bssid'])
     for client in AP['clients']:
         print '\t[%s] power: %s, beacons: %s' % (client['bssid'], client['power'], client['beacons'])
