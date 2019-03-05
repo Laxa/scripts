@@ -8,7 +8,8 @@ import time
 import sys
 import re
 
-requests.packages.urllib3.disable_warnings()
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 URL = 'https://www.boursorama.com'
 MAX_TRIES = 3
@@ -42,22 +43,26 @@ for stock in wallet:
     scrap_data = json.loads(match[0])
     current_price = scrap_data['last']
 
-    match = re.findall('<td class=\"c-table__cell c-table__cell--dotted c-table__cell[^\"]*">(.+?)</td>', data, re.DOTALL)
+    match = re.findall('<span class="u-color-stream-(?:down|up)"><span class="c-instrument c-instrument--variation" data-ist-variation>([^<]*)', data)
+    current_percent = match[0].strip().rstrip()[:-1]
+
+    match = re.findall('<td class=\"c-table__cell c-table__cell--dotted c-table__cell[^\"]*">.+?(\d{1,3}\.\d{1,3}%).+?</td>', data, re.DOTALL)
     week_percent, month_percent, year_percent = 0, 0, 0
     try:
-        week_percent = float(match[0].strip().rstrip()[:-1])
-        month_percent = float(match[1].strip().rstrip()[:-1])
-        year_percent = float(match[2].strip().rstrip()[:-1])
+        week_percent = float(match[4].strip().rstrip()[:-1])
+        month_percent = float(match[5].strip().rstrip()[:-1])
+        year_percent = float(match[8].strip().rstrip()[:-1])
     except:
         pass
 
     base_price = stock['b']
     q = stock['q']
 
-    text = stock['name'] + '{} {} gain par rapport achat {}'.format(stock['name'],
+    text = '{} {} {}% gain par rapport achat {}'.format(stock['name'],
         str(current_price),
+        str(current_percent),
         str(round((current_price * q) - (q * base_price), 2)))
-    text += '\nResultat semaine: {}%, mois: {}%, annnee: {}%'.format(str(week_percent),
+    text += '\nResultat semaine: {}%, 1 mois: {}%, 1 annnee: {}%'.format(str(week_percent),
             str(month_percent), str(year_percent))
 
     print(text)
