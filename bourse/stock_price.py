@@ -46,23 +46,29 @@ for stock in wallet:
     match = re.findall('<span class="u-color-stream-(?:down|up)"><span class="c-instrument c-instrument--variation" data-ist-variation>([^<]*)', data)
     current_percent = match[0].strip().rstrip()[:-1]
 
-    match = re.findall('<td class=\"c-table__cell c-table__cell--dotted c-table__cell[^\"]*">.+?(\d{1,3}\.\d{1,3}%).+?</td>', data, re.DOTALL)
+    match = re.findall('<td class=\"c-table__cell c-table__cell--dotted c-table__cell[^\"]*">.+?(-?\d{1,3}\.\d{1,3}%).+?</td>', data, re.DOTALL)
     week_percent, month_percent, year_percent = 0, 0, 0
     try:
         week_percent = float(match[4].strip().rstrip()[:-1])
         month_percent = float(match[5].strip().rstrip()[:-1])
+        sixmonth_percent = float(match[7].strip().rstrip()[:-1])
         year_percent = float(match[8].strip().rstrip()[:-1])
     except:
         pass
 
     base_price = stock['b']
     q = stock['q']
+    try:
+        percent_win = ((current_price - base_price) / base_price) * 100
+    except ZeroDivisionError:
+        percent_win = 0
 
-    text = '{} {} {}% gain par rapport achat {}'.format(stock['name'],
+    text = '{} {} {}% gain par rapport achat {} ({}%)'.format(stock['name'],
         str(current_price),
         str(current_percent),
-        str(round((current_price * q) - (q * base_price), 2)))
-    text += '\nResultat semaine: {}%, 1 mois: {}%, 1 annnee: {}%'.format(str(week_percent),
-            str(month_percent), str(year_percent))
+        str(round((current_price * q) - (q * base_price), 2)),
+        str(round(percent_win, 2)))
+    text += '\nResultat semaine: {}%, 1 mois: {}%, 6 mois: {} %, 1 annnee: {}%'.format(str(week_percent),
+            str(month_percent), str(sixmonth_percent), str(year_percent))
 
     print(text)
