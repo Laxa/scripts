@@ -1,5 +1,5 @@
 from recon.core.module import BaseModule
-from subprocess import check_output
+from subprocess import check_output, DEVNULL
 from datetime import datetime
 import re
 
@@ -22,7 +22,7 @@ class Module(BaseModule):
         for ip_address in hosts:
             self.heading(ip_address, level=0)
             try:
-                output = check_output('openssl s_client -showcerts -connect {}:443 </dev/null 2>&1| openssl x509 -noout -text'.format(ip_address), shell=True)
+                output = check_output('timeout 1 openssl s_client -showcerts -connect {}:443 </dev/null 2>&1| openssl x509 -noout -text'.format(ip_address), shell=True, stderr=DEVNULL)
             except:
                 continue
             data = re.findall('(DNS:.*)', output)
