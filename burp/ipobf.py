@@ -12,7 +12,7 @@ def parse_ip(ip_as_str):
 		ip = map(int, ip_as_str.split('.'))
 	except:
 		raise RuntimeError('Invalid parameter')
-
+    
 	if len(ip) == 4 and all((d >= 0 and d <= 255) for d in ip):
 		return ip
 	else:
@@ -177,4 +177,4 @@ if __name__ == '__main__':
 
     # Generate and print mutations
     for m in generate_mutations(ip):
-	print m
+        print(m)
