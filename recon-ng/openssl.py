@@ -14,11 +14,12 @@ class Module(BaseModule, ThreadingMixin):
         'version': '1.0',
         'query': 'SELECT DISTINCT ip_address FROM hosts WHERE ip_address IS NOT NULL',
         'comments': (
-            'Will possibly have duplicates, remove them with `db query delete from hosts where rowid not in (select min(rowid) from hosts group by host)`',
+            'Will possibly have duplicates, remove them with:',
+            'db query delete from hosts where rowid not in (select min(rowid) from hosts group by host)',
         ),
         'options': (
-            ('timeout', 1, False, 'Timeout for the openssl client connection'),
-            ('port', 443, False, 'Port to initiate SSL connection to'),
+            ('timeout', 1, True, 'Timeout for the openssl client connection'),
+            ('port', 443, True, 'Port to initiate SSL connection to'),
         ),
     }
 
