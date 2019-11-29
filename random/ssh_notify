@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# script to place in /usr/local/sbin/ssh_notify
+# then edit the /etc/pam.d/sshd file like this
+# session    optional     pam_exec.so /usr/local/sbin/ssh_notify
+
+DATE=`date '+%H:%M:%S'`
+resolved=`host "$PAM_RHOST" | rev | cut -d ' ' -f 1 | rev`
+msg=$(printf "[%s] %s connected from %s (%s)" "$DATE" "$PAM_USER" "$PAM_RHOST" "$resolved")
+XDG_RUNTIME_DIR=/run/user/1000 DBUS_SESSION_BUS_ADDRESS='unix:path=/run/user/1000/bus' su laxa -w XDG_RUNTIME_DIR,DBUS_SESSION_BUS_ADDRESS -c "/usr/bin/notify-send --urgency=critical -t 0 '${msg}'"
