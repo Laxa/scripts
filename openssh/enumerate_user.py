@@ -16,7 +16,7 @@ def add_boolean(*args, **kwargs):
     pass
 
 
-old_service_accept = paramiko.auth_handler.AuthHandler._handler_table[
+old_service_accept = paramiko.auth_handler.AuthHandler._client_handler_table[
         paramiko.common.MSG_SERVICE_ACCEPT]
 
 def service_accept(*args, **kwargs):
@@ -28,7 +28,7 @@ def userauth_failure(*args, **kwargs):
     raise InvalidUsername()
 
 
-paramiko.auth_handler.AuthHandler._handler_table.update({
+paramiko.auth_handler.AuthHandler._client_handler_table.update({
     paramiko.common.MSG_SERVICE_ACCEPT: service_accept,
     paramiko.common.MSG_USERAUTH_FAILURE: userauth_failure
 })
