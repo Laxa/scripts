@@ -18,7 +18,7 @@ ERROR_DELAY = 30
 proxies = False
 debug = False
 
-wallet = []
+wallet = []]
 
 # Verify day and exit if bourse not open
 day = datetime.datetime.today().weekday()
@@ -27,6 +27,8 @@ day = datetime.datetime.today().weekday()
 if day not in [0, 1, 2, 3, 4] and not debug:
     sys.exit()
 
+total = 0
+total_cost = 0
 for stock in wallet:
     url = '{}/cours/{}/'.format(URL, stock['endpoint'])
     cur_try = 1
@@ -42,6 +44,9 @@ for stock in wallet:
     match = re.findall(regex, data)
     scrap_data = json.loads(match[0])
     current_price = scrap_data['last']
+
+    total += current_price * stock['q']
+    total_cost += stock['b'] * (stock['q'] - stock['bonus'])
 
     match = re.findall('<span class="u-color-stream-(?:down|up)"><span class="c-instrument c-instrument--variation" data-ist-variation>([^<]*)', data)
     current_percent = match[0].strip().rstrip()[:-1]
@@ -72,3 +77,10 @@ for stock in wallet:
             str(month_percent), str(sixmonth_percent), str(year_percent))
 
     print(text)
+
+gain = ((total - total_cost) / total_cost) * 100
+text = 'Investi: {}, Valeur: {}, Gain: {}%'.format(str(round(total_cost, 2)),
+    str(round(total, 2)),
+    str(round(gain, 2)))
+
+print(text)
